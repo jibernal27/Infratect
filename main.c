@@ -124,7 +124,6 @@ unsigned short leerMuestreo( unsigned short * pista, int bitpos, int bitsPorMues
     //Número de bits restantes hasta que se acabe el unisigned short actual. Incluye el bit actual.
     int bitsRestantes=16-numBitsDesdeInicio;
 
-
     for (int i = 0; i < bitsPorMuestreo; i++)
     {
 
@@ -139,6 +138,7 @@ unsigned short leerMuestreo( unsigned short * pista, int bitpos, int bitsPorMues
 
       for (int i = numBitsDesdeInicio; i < bitsPorMuestreo-numBitsDesdeInicio+1; i++)
       {
+
 
       }
 
@@ -204,7 +204,6 @@ void cambiarBitEnposicion(unsigned short indice, int posicion,unsigned short bit
   aRetinrar =indice^ mascara;
 
 }
-
 
 // Retornar la respeusta
   return aRetinrar;
