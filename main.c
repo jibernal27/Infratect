@@ -179,34 +179,30 @@ int darBitEnPosicion(unsigned short indice, int posicion)
 
 /**
 * Modifica el bit en la posicion deseada por uno dado por aprametro
-*indice:  unsigned short al cual se le va a cambiar el valor deseado
+*indice:  apuntador al unsigned short al cual se le va a cambiar el valor deseado
 *posicion: posicion del unsigned short en la cual se va a cambiar el bit
 *bit: Valor del bit por el cual se va a cambiar.
 */
-void cambiarBitEnposicion(unsigned short indice, int posicion,unsigned short bit)
+void cambiarBitEnposicion(unsigned short *indice, int posicion,unsigned short bit)
 {
-  //Inicializa la respuesta
-  unsigned short aRetinrar =indice;
-  //Cambia la posicion relativa de izquierda a derecha a de derecha a izquierda
-  int posicionVerdadera=15-posicion
-  //Compruba si debe hacer algun cambio
-  if(darBitEnPosicion(indice,posicion)==bit)
-    {
 
-    }
-      else
-    {
-      //Se debe hacer un cambio, el operador ^ niega los bits que esten ^1
-  unsigned short uno =  1;
-  //Asegurarse que solo el bit en la posicion deseada tenga valor 1
-  unsigned short mascara=uno << posicionVerdadera;
-  //Negar el bit solo en la posicion deseada
-  aRetinrar =indice^ mascara;
+//Posicion del bit
+	int posicionVerdadera=15-posicion;
+	// Comprobar si no hace falta cambiarl el bit
+	if(darBitEnPosicion(*indice,posicion)==bit)
+	{
 
-}
+	}
+	else
+	{
+	unsigned short uno =  1;
+   	unsigned short mascara=uno << posicionVerdadera;
+    //Utiliza la mascar apara invertir solo la posicion deseada
+    *indice = *indice^ mascara;
 
-// Retornar la respeusta
-  return aRetinrar;
+	}
+
+
 
 }
 /*
