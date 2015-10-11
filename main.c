@@ -153,58 +153,67 @@ unsigned short leerMuestreo( unsigned short * pista, int bitpos, int bitsPorMues
 
 
 }
+
 /*
 *Funcion que retorna la representación en int del bit en la posicion deseada
 *indice: shor del cual se quiere saber el valor del bit en al posición
-*posiciom: Posición del bit que se desea encontrar.
+*posicion: Posición del bit que se desea encontrar.
+*cantidad: cantidad de bits deseados.
 */
-int darBitEnPosicion(unsigned short indice, int posicion)
+unsigned short darBitEnPosicion(unsigned short indice, int posicion,int cantidad)
 {
+	// Posción de izquierda a derecha
+	int posicionVerdadera = 15 - posicion;
+	//Ayudante de la mascara, genera tantos 1 al final como posiciones deseadas
+	unsigned short uno = pow(2, cantidad) - 1;
 
-  //Se empieza a contar desde el inicio del unsigned short de izquierda a derecha, por ende
-  // la posición n de izqierda a derecha seria al posicion 15-n de derecha a izquierda.
-  int posicionVerdadera=15-posicion;
-  //EL uno tiene la ventaja de ser cero en todos sus bits menos en la posicion 15 de izquierda a derecha
-  unsigned short uno=1;
-  //Correo el unico 1 del uno hacia la posicion deseada
-  int mascara =  uno << posicionVerdadera;
-  //El & anula todos las posiciones del uno que son 0, por ende solo queda la respuesta en la posicion deseada
-  // si hay un 1 en el short buscado sera 1 en la mascaraDeN, si hay un cero ser aun cero
-  int mascaraDeN = indice & mascara;
-  // Se devuelve la mascara hasta que el bit en al posicion deseada queda en la posicion 15 de iziquierda a derecha
-  int aRetornar = mascaraDeN >> posicionVerdadera;
-  // Retorna el valor, si el bit en la poscion deseada era 0 se retonra un cero, si era 1 se retorna un 1.
-  return aRetornar;
+	//Crea la mascara, dejando los 1 solo en las posciones en las que  se desea concer l valor de los bit
+	unsigned short mascara = uno << (posicionVerdadera - cantidad+1);
+	//Hace el &, por lo cual solo los valores de bit deseados quedaran en mascar de n
+	unsigned short mascaraDeN = indice & mascara;
+	//Reotorna los valores de bits deseados en un unsigned short.
+	unsigned short aRetornar = mascaraDeN >> (posicionVerdadera-cantidad+1);
+	return aRetornar;
+
 }
 
-/**
+/*
 * Modifica el bit en la posicion deseada por uno dado por aprametro
 *indice:  apuntador al unsigned short al cual se le va a cambiar el valor deseado
 *posicion: posicion del unsigned short en la cual se va a cambiar el bit
+*cantidad: cantidad de bits a cambiar.
 *bit: Valor del bit por el cual se va a cambiar.
 */
-void cambiarBitEnposicion(unsigned short *indice, int posicion,unsigned short bit)
+void cambiarBitEnposicion(unsigned short *indice, int posicion,int cantidad, unsigned short bit)
 {
 
-//Posicion del bit
-	int posicionVerdadera=15-posicion;
-	// Comprobar si no hace falta cambiarl el bit
-	if(darBitEnPosicion(*indice,posicion)==bit)
+
+	//Recorre cada uno de los bits deseados
+	for (int i = 0; i < cantidad; i++)
 	{
+		//La posisicón actual de izquierda a derecha del char
+		int posicionVerdadera = posicion+i;
+		//Posicion de izquierda a derecha del bit
+		int posicionEnBit = 15- cantidad +i + 1;
+		//Compara si los bits son iguales.
+		if (darBitEnPosicion(*indice, posicionVerdadera, 1) == darBitEnPosicion(bit, posicionEnBit, 1))
+		{
+			//Si son iguales no hay que hacer nada.
+		}
+		else
+		{
+			//Crea un 1 que s eencargara de cambiar el valor del bit deseado
+			unsigned short uno = 1;
+			//Corre el uno hasta la posicion deseada
+			unsigned short mascara = uno << 15-posicionVerdadera;
+			//Iniverte el bit en la posción deseada
+			*indice = *indice^ mascara;
 
+		}
 	}
-	else
-	{
-	unsigned short uno =  1;
-   	unsigned short mascara=uno << posicionVerdadera;
-    //Utiliza la mascar apara invertir solo la posicion deseada
-    *indice = *indice^ mascara;
-
-	}
-
-
 
 }
+
 /*
 *  Funcion para fundir dos pistas monofonicas en una sola estereo
 *  parte1: apunta a un vector de short que contiene los muestreos de una pista
@@ -216,19 +225,6 @@ void cambiarBitEnposicion(unsigned short *indice, int posicion,unsigned short bi
 void unirArchivosWAVE( unsigned short *parte1, unsigned short *parte2, unsigned short *salida, int bitsPorMuestreo )
 {
 
-int tam=sizeof(*parte1)/sizeof(unsigned short);
-  for(posActua=0;posActua<tam;posActua++)
-  {
-    salida[2*posActua]=parte1[posActua];
-    salida[2*posActua+1]=parte2[posActua]
-  }
-  int res=(2*tam)%16
-  int otro=res;
-while (res)
- {
-   salida[2*tam+(otro-res)]=0;
-  res--;
-}
 
 }
 
