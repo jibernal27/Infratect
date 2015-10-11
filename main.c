@@ -1,3 +1,6 @@
+//Jairo Iván Bernal Acosta 201317123 ji.bernal27@uniandes.edu.co
+
+#define _CRT_SECURE_NO_DEPRECATE
 #include "STDIO.H"
 #include "math.h"
 #include "stdlib.h"
@@ -6,82 +9,84 @@
 
 #define BIT_POR_BYTE   8
 
+
 //En esta estructura se manejaran las pistas de sonido
 struct WaveData {
-  unsigned int SoundLength;       //Numero de bytes ocupados por la pista
-  unsigned int numSamples;        //Numero de muestreos en la pista
-  unsigned int bitsPerSample;     //Numero de bits en cada muestreo
-  unsigned short *Sample;         //Secuencia de muestreos
+	unsigned int SoundLength;       //Numero de bytes ocupados por la pista
+	unsigned int numSamples;        //Numero de muestreos en la pista
+	unsigned int bitsPerSample;     //Numero de bits en cada muestreo
+	unsigned short *Sample;         //Secuencia de muestreos
 };                                //  numSamples muestreos, cada uno de bitsPerSample bits
 
 struct HeaderType {
-  int            RIFF;              //RIFF header
-  char           relleno1 [18];     //No lo usamos
-  unsigned short Canales;           //canales 1 = mono; 2 = estereo
-  int            Frecuencia;        //frecuencia
-  int            TasaBit;           //Frecuencia * canales * BitRes/8
-  short          AlineamientoBloque;//Alineamento de los boques
-  unsigned short BitRes;            //bit resolucion 8/16/32 bit
-  int            relleno2;          //No lo usamos
-  int            subChunckSize;     // numSamples * canales * BitRes/8
+	int            RIFF;              //RIFF header
+	char           relleno1[18];     //No lo usamos
+	unsigned short Canales;           //canales 1 = mono; 2 = estereo
+	int            Frecuencia;        //frecuencia
+	int            TasaBit;           //Frecuencia * canales * BitRes/8
+	short          AlineamientoBloque;//Alineamento de los boques
+	unsigned short BitRes;            //bit resolucion 8/16/32 bit
+	int            relleno2;          //No lo usamos
+	int            subChunckSize;     // numSamples * canales * BitRes/8
 } Header;
 
-void cargarWAVE( struct HeaderType *, struct WaveData *, char * );
-int escribirWAVE( struct HeaderType *, struct WaveData *, char * );
-void escribirMuestreo ( unsigned short * pista, int bitpos, unsigned short muestreo, int bitsPorMuestreo );
-unsigned short leerMuestreo( unsigned short * pista, int bitpos, int bitsPorMuestreo );
-void unirArchivosWAVE( unsigned short *, unsigned short *, unsigned short *, int );
-int detectarBitsPorMuestreo( struct WaveData * );
-void copiarMuestreo(unsigned short *fuente, int *posEntrada, unsigned short *destino, int *posSalida, int bitsPorMuestreo );
-void escribir1bit( unsigned short *, int, unsigned short );
-void empaquetar( struct WaveData *, int );
-void desempaquetar ( struct WaveData *, int );
-void corregirHeader( struct HeaderType * );
+void cargarWAVE(struct HeaderType *, struct WaveData *, char *);
+int escribirWAVE(struct HeaderType *, struct WaveData *, char *);
+void escribirMuestreo(unsigned short * pista, int bitpos, unsigned short muestreo, int bitsPorMuestreo);
+unsigned short leerMuestreo(unsigned short * pista, int bitpos, int bitsPorMuestreo);
+void unirArchivosWAVE(unsigned short *, unsigned short *, unsigned short *, int);
+int detectarBitsPorMuestreo(struct WaveData *);
+void copiarMuestreo(unsigned short *fuente, int *posEntrada, unsigned short *destino, int *posSalida, int bitsPorMuestreo);
+void escribir1bit(unsigned short *, int, unsigned short);
+void empaquetar(struct WaveData *, int);
+void desempaquetar(struct WaveData *, int);
+void corregirHeader(struct HeaderType *);
 
 struct WaveData pistaEntrada1;      //Estructura para la primera pista de entrada
 struct WaveData pistaEntrada2;      //Estructura para la segunda pista de entrada
 struct WaveData pistaSalida;		    //Estructura para la pista de salida
 
 
-int main (int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	int bitsPorMuestreo;
 
-	if ( argc != 4 ){
-		printf( "Faltan argumentos - Deben ser 3 archivos:\n" );
-		printf( "  - archivo de entrada 1 (monofonico)\n" );
-        printf( "  - archivo de entrada 2 (monofonico)\n" );
-        printf( "  - archivo de salida (esfonico)\n" );
-		system( "pause" );
+	if (argc != 4){
+		printf("Faltan argumentos - Deben ser 3 archivos:\n");
+		printf("  - archivo de entrada 1 (monofonico)\n");
+		printf("  - archivo de entrada 2 (monofonico)\n");
+		printf("  - archivo de salida (esfonico)\n");
+		system("pause");
 		return -1;
 	}
 
-	printf( "Archivo fuente 1 %s\n", argv[1] );
-	printf( "Archivo fuente  2 %s\n", argv[2] );
-	printf( "Archivo Destino %s\n", argv[3] );
-	system( "pause" );
+	printf("Archivo fuente 1 %s\n", argv[1]);
+	printf("Archivo fuente  2 %s\n", argv[2]);
+	printf("Archivo Destino %s\n", argv[3]);
+	system("pause");
 
-	cargarWAVE( &Header, &pistaEntrada1, argv[1] );
-	cargarWAVE( &Header, &pistaEntrada2, argv[2] );
+	cargarWAVE(&Header, &pistaEntrada1, argv[1]);
+	cargarWAVE(&Header, &pistaEntrada2, argv[2]);
 
-	bitsPorMuestreo = detectarBitsPorMuestreo( &pistaEntrada1 );
-  if ( bitsPorMuestreo != detectarBitsPorMuestreo( &pistaEntrada2 ) ){
-    printf( "Los archivos tienen diferente numero de bits por muestreo\n" );
-  }
-	empaquetar( &pistaEntrada1, bitsPorMuestreo );
-	empaquetar( &pistaEntrada2, bitsPorMuestreo );
+	bitsPorMuestreo = detectarBitsPorMuestreo(&pistaEntrada1);
+	if (bitsPorMuestreo != detectarBitsPorMuestreo(&pistaEntrada2)){
+		printf("Los archivos tienen diferente numero de bits por muestreo\n");
+	}
+	empaquetar(&pistaEntrada1, bitsPorMuestreo);
+	empaquetar(&pistaEntrada2, bitsPorMuestreo);
 
 	pistaSalida.bitsPerSample = bitsPorMuestreo;
 	pistaSalida.numSamples = pistaEntrada1.numSamples;
-	pistaSalida.SoundLength = 2*pistaEntrada1.SoundLength;
-	pistaSalida.Sample = (unsigned short*)malloc( pistaSalida.SoundLength );
+	pistaSalida.SoundLength = 2 * pistaEntrada1.SoundLength;
+	pistaSalida.Sample = (unsigned short*)malloc(pistaSalida.SoundLength);
 
-	unirArchivosWAVE( pistaEntrada1.Sample, pistaEntrada2.Sample, pistaSalida.Sample, bitsPorMuestreo );
-	corregirHeader( &Header );
-	desempaquetar( &pistaSalida, bitsPorMuestreo );
-	escribirWAVE( &Header, &pistaSalida, argv[3] );
+	int tam = pistaEntrada1.SoundLength/2;
+	unirArchivosWAVE(pistaEntrada1.Sample, pistaEntrada2.Sample, pistaSalida.Sample, bitsPorMuestreo,tam);
+	corregirHeader(&Header);
+	desempaquetar(&pistaSalida, bitsPorMuestreo);
+	escribirWAVE(&Header, &pistaSalida, argv[3]);
 
-	printf ("Concluy� exitosamente.\n");
+	printf("Concluy� exitosamente.\n");
 	system("pause");
 	return 0;
 }
@@ -92,7 +97,7 @@ int main (int argc, char* argv[])
 *posicion: Posición del bit que se desea encontrar.
 *cantidad: cantidad de bits deseados.
 */
-unsigned short darBitEnPosicion(unsigned short indice, int posicion,int cantidad)
+unsigned short darBitEnPosicion(unsigned short indice, int posicion, int cantidad)
 {
 	// Posción de izquierda a derecha
 	int posicionVerdadera = 15 - posicion;
@@ -100,11 +105,11 @@ unsigned short darBitEnPosicion(unsigned short indice, int posicion,int cantidad
 	unsigned short uno = pow(2, cantidad) - 1;
 
 	//Crea la mascara, dejando los 1 solo en las posciones en las que  se desea concer l valor de los bit
-	unsigned short mascara = uno << (posicionVerdadera - cantidad+1);
+	unsigned short mascara = uno << (posicionVerdadera - cantidad + 1);
 	//Hace el &, por lo cual solo los valores de bit deseados quedaran en mascar de n
 	unsigned short mascaraDeN = indice & mascara;
 	//Reotorna los valores de bits deseados en un unsigned short.
-	unsigned short aRetornar = mascaraDeN >> (posicionVerdadera-cantidad+1);
+	unsigned short aRetornar = mascaraDeN >> (posicionVerdadera - cantidad + 1);
 	return aRetornar;
 
 }
@@ -116,7 +121,7 @@ unsigned short darBitEnPosicion(unsigned short indice, int posicion,int cantidad
 *cantidad: cantidad de bits a cambiar.
 *bit: Valor del bit por el cual se va a cambiar.
 */
-void cambiarBitEnposicion(unsigned short *indice, int posicion,int cantidad, unsigned short bit)
+void cambiarBitEnposicion(unsigned short *indice, int posicion, int cantidad, unsigned short bit)
 {
 
 
@@ -124,9 +129,9 @@ void cambiarBitEnposicion(unsigned short *indice, int posicion,int cantidad, uns
 	for (int i = 0; i < cantidad; i++)
 	{
 		//La posisicón actual de izquierda a derecha del char
-		int posicionVerdadera = posicion+i;
+		int posicionVerdadera = posicion + i;
 		//Posicion de izquierda a derecha del bit
-		int posicionEnBit = 15- cantidad +i + 1;
+		int posicionEnBit = 15 - cantidad + i + 1;
 		//Compara si los bits son iguales.
 		if (darBitEnPosicion(*indice, posicionVerdadera, 1) == darBitEnPosicion(bit, posicionEnBit, 1))
 		{
@@ -137,7 +142,7 @@ void cambiarBitEnposicion(unsigned short *indice, int posicion,int cantidad, uns
 			//Crea un 1 que s eencargara de cambiar el valor del bit deseado
 			unsigned short uno = 1;
 			//Corre el uno hasta la posicion deseada
-			unsigned short mascara = uno << 15-posicionVerdadera;
+			unsigned short mascara = uno << 15 - posicionVerdadera;
 			//Iniverte el bit en la posción deseada
 			*indice = *indice^ mascara;
 
@@ -225,8 +230,8 @@ unsigned short leerMuestreo(unsigned short * pista, int bitpos, int bitsPorMuest
 	if (bitsPorMuestreo>bitsRestantes)
 	{
 		//Toma la siguiente posicon
-			sigueinte = pista[posEnArrrglo + 1];
-	//Cmabia el incio indice por los bits finales de actual
+		sigueinte = pista[posEnArrrglo + 1];
+		//Cmabia el incio indice por los bits finales de actual
 		cambiarBitEnposicion(aRetornar, 0, bitsRestantes, darBitEnPosicion(actual, numBitsDesdeInicio, bitsRestantes));
 		//Cambia los bits restantes para completar el meustreo de incio por los inciales de sigueinte
 		cambiarBitEnposicion(aRetornar, bitsRestantes, bitsPorMuestreo - bitsRestantes, darBitEnPosicion(sigueinte, 0, bitsSiguiente));
@@ -251,10 +256,10 @@ unsigned short leerMuestreo(unsigned short * pista, int bitpos, int bitsPorMuest
 *  bitsPorMuestreo: tamanio en bits de los muestreos
 */
 //TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
-void unirArchivosWAVE(unsigned short *parte1, unsigned short *parte2, unsigned short *salida, int bitsPorMuestreo)
+void unirArchivosWAVE(unsigned short *parte1, unsigned short *parte2, unsigned short *salida, int bitsPorMuestreo,int tam)
 {
 	//TODO definir tamaño
-	int tam = 100;
+	//int tam =
 	//Calcula cuantos ceros quedan al final
 	int ceros = (tam * 16) % bitsPorMuestreo;
 	//Poscion incial
@@ -278,7 +283,7 @@ void unirArchivosWAVE(unsigned short *parte1, unsigned short *parte2, unsigned s
 		int posParte2 = i*bitsPorMuestreo;
 		// muestreo que se va a escribir
 		aPoner = leerMuestreo(parte2, posParte2, bitsPorMuestreo);
-	//Escribir el muesteo
+		//Escribir el muesteo
 		escribirMuestreo(salida, posSalida, aPoner, bitsPorMuestreo);
 
 		//Cambiar la posición en la salida
@@ -291,9 +296,9 @@ void unirArchivosWAVE(unsigned short *parte1, unsigned short *parte2, unsigned s
 	if (ceros != 0)
 	{
 		//Esocoge el ultimo shar y le pone los ceros
-    //Por alguna razón funciona acá pero no al final
+		//Por alguna razón funciona acá pero no al final
 		unsigned short *apuntdorAlFinal = &salida[tam - 1];
-		cambiarBitEnposicion(apuntdorAlFinal, posSalida%16, ceros, 0);
+		cambiarBitEnposicion(apuntdorAlFinal, posSalida % 16, ceros, 0);
 
 	}
 
@@ -304,11 +309,11 @@ void unirArchivosWAVE(unsigned short *parte1, unsigned short *parte2, unsigned s
 * Funci�n que detecta el numero de bits por muestreo
 * NO MODIFICAR
 */
-int detectarBitsPorMuestreo( struct WaveData * voice ){
+int detectarBitsPorMuestreo(struct WaveData * voice){
 	int posiciones = 0;
 	unsigned short sample = voice->Sample[0];
 
-	while ( sample ){
+	while (sample){
 		posiciones++;
 		sample <<= 1;
 	}
@@ -325,10 +330,10 @@ int detectarBitsPorMuestreo( struct WaveData * voice ){
 *  posSalida: posicion de destino (en bits) a donde se copiara el muestreo
 *  bitsPorMuestreo: tamanio en bits de los muestreos
 */
-void copiarMuestreo(unsigned short *fuente, int *posEntrada, unsigned short *destino, int *posSalida, int bitsPorMuestreo )
+void copiarMuestreo(unsigned short *fuente, int *posEntrada, unsigned short *destino, int *posSalida, int bitsPorMuestreo)
 {
-	unsigned short muestreo = leerMuestreo( fuente, *posEntrada, bitsPorMuestreo );
-	escribirMuestreo ( destino, *posSalida, muestreo, bitsPorMuestreo );
+	unsigned short muestreo = leerMuestreo(fuente, *posEntrada, bitsPorMuestreo);
+	escribirMuestreo(destino, *posSalida, muestreo, bitsPorMuestreo);
 	*posEntrada += bitsPorMuestreo;
 	*posSalida += bitsPorMuestreo;
 }
@@ -337,17 +342,17 @@ void copiarMuestreo(unsigned short *fuente, int *posEntrada, unsigned short *des
 * Funcion para empaquetar los muestreos de una pista
 * NO MODIFICAR
 */
-void empaquetar ( struct WaveData *pista, int bitsPorMuestreo ){
+void empaquetar(struct WaveData *pista, int bitsPorMuestreo){
 	int i;
 	int posEntrada = 0;
 	int posSalida = 0;
-    unsigned short * nuevoSample;
+	unsigned short * nuevoSample;
 
-	nuevoSample = (unsigned short *)malloc( pista->SoundLength );
+	nuevoSample = (unsigned short *)malloc(pista->SoundLength);
 
 	for (i = 0; i < pista->numSamples; i++){
-		copiarMuestreo( pista->Sample, &posEntrada, nuevoSample, &posSalida, bitsPorMuestreo );
-		posEntrada += ( 2*BIT_POR_BYTE - bitsPorMuestreo );
+		copiarMuestreo(pista->Sample, &posEntrada, nuevoSample, &posSalida, bitsPorMuestreo);
+		posEntrada += (2 * BIT_POR_BYTE - bitsPorMuestreo);
 	}
 	pista->bitsPerSample = bitsPorMuestreo;
 	free(pista->Sample);
@@ -360,32 +365,32 @@ void empaquetar ( struct WaveData *pista, int bitsPorMuestreo ){
 *  bitpos: posicion del bit de la pista que se desea modificar
 *  bit: vale 1 o 0, indicando cu�l es el valor que se desea asignar al bit
 */
-void escribir1bit( unsigned short * pista, int bitpos, unsigned short bit ){
-	escribirMuestreo ( pista, bitpos, bit, 1 );
+void escribir1bit(unsigned short * pista, int bitpos, unsigned short bit){
+	escribirMuestreo(pista, bitpos, bit, 1);
 }
 
 /*
 * Funcion para desempaquetar los muestreos de una pista
 * NO MODIFICAR
 */
-void desempaquetar ( struct WaveData * pista, int bitsPorMuestreo ){
+void desempaquetar(struct WaveData * pista, int bitsPorMuestreo){
 	int i;
 	int j;
 	int posEntrada = 0;
 	int posSalida = 0;
-  unsigned short * nuevoSample;
+	unsigned short * nuevoSample;
 
-	nuevoSample = (unsigned short*)malloc( pista->SoundLength );
-	for ( i = 0; i < 2*pista->numSamples; i++ ){
-		copiarMuestreo( pista->Sample, &posEntrada, nuevoSample, &posSalida, bitsPorMuestreo );
-		for ( j = 0; j < 16 - bitsPorMuestreo; j++ ){
-			escribir1bit( nuevoSample, posSalida, 0 );
+	nuevoSample = (unsigned short*)malloc(pista->SoundLength);
+	for (i = 0; i < 2 * pista->numSamples; i++){
+		copiarMuestreo(pista->Sample, &posEntrada, nuevoSample, &posSalida, bitsPorMuestreo);
+		for (j = 0; j < 16 - bitsPorMuestreo; j++){
+			escribir1bit(nuevoSample, posSalida, 0);
 			posSalida++;
 		}
 	}
 
 	pista->bitsPerSample = 16;
-	free( pista->Sample );
+	free(pista->Sample);
 	pista->Sample = nuevoSample;
 
 }
@@ -394,49 +399,49 @@ void desempaquetar ( struct WaveData * pista, int bitsPorMuestreo ){
 *  Carga el archivo WAVE en memoria.
 *  NO MODIFICAR.
 */
-void cargarWAVE ( struct HeaderType * header, struct WaveData * pista, char * FileName ){
-  FILE * WAVFile;
+void cargarWAVE(struct HeaderType * header, struct WaveData * pista, char * FileName){
+	FILE * WAVFile;
 
-  WAVFile = fopen( FileName, "rb" );
-  if ( WAVFile == NULL ){
-    printf( "No se puede abrir el archivo (%s)\n", FileName );
-    exit( 0 );
-  }
+	WAVFile = fopen(FileName, "rb");
+	if (WAVFile == NULL){
+		printf("No se puede abrir el archivo (%s)\n", FileName);
+		exit(0);
+	}
 
-  //Cargar el encabezado
-  fread( header, 44, 1, WAVFile );
+	//Cargar el encabezado
+	fread(header, 44, 1, WAVFile);
 
-  pista->SoundLength = header->subChunckSize;
-  pista->Sample = (unsigned short *)malloc( pista->SoundLength ); //Asignar memoria
-  if ( pista->Sample == NULL ){
-    printf( "No hay memoria para cargar el archivo (%s)\n", FileName );
-    exit( 0 );
-  }
+	pista->SoundLength = header->subChunckSize;
+	pista->Sample = (unsigned short *)malloc(pista->SoundLength); //Asignar memoria
+	if (pista->Sample == NULL){
+		printf("No hay memoria para cargar el archivo (%s)\n", FileName);
+		exit(0);
+	}
 
-  //Check RIFF header
-  if ( header->RIFF != 0x46464952 ){
-    printf( "El archivo no es de tipo wav (%s)\n", FileName );
-    exit( 0 );
-  }
+	//Check RIFF header
+	if (header->RIFF != 0x46464952){
+		printf("El archivo no es de tipo wav (%s)\n", FileName);
+		exit(0);
+	}
 
-  //Check canales
-  if ( header->Canales != 1 ){
-    printf( "El archivo no es monofonico (%s)\n", FileName );
-    exit( 0 );
-  }
+	//Check canales
+	if (header->Canales != 1){
+		printf("El archivo no es monofonico (%s)\n", FileName);
+		exit(0);
+	}
 
-  //Check resoluci�n bits
-  if ( header->BitRes != 16 ){
-    printf( "El archivo no es de 16 bits (%s)\n", FileName );
-    exit( 0 );
-  }
+	//Check resoluci�n bits
+	if (header->BitRes != 16){
+		printf("El archivo no es de 16 bits (%s)\n", FileName);
+		exit(0);
+	}
 
-  //Carga los muestreos
-  fread( pista->Sample, pista->SoundLength, 1, WAVFile );
+	//Carga los muestreos
+	fread(pista->Sample, pista->SoundLength, 1, WAVFile);
 
-  fclose( WAVFile );
+	fclose(WAVFile);
 
-  pista->numSamples = header->subChunckSize / 2;
+	pista->numSamples = header->subChunckSize / 2;
 
 }
 
@@ -444,28 +449,28 @@ void cargarWAVE ( struct HeaderType * header, struct WaveData * pista, char * Fi
 * Funcion que escribe un archivo WAVE en su totalidad
 * NO MODIFICAR
 */
-int escribirWAVE ( struct HeaderType * header, struct WaveData * pista, char * FileName ){
-  FILE * WAVFile;
+int escribirWAVE(struct HeaderType * header, struct WaveData * pista, char * FileName){
+	FILE * WAVFile;
 
-  WAVFile = fopen( FileName, "wb" );
+	WAVFile = fopen(FileName, "wb");
 
-  if ( WAVFile == NULL ){
-    printf( "No se puede crear el archivo (%s)\n", FileName );
-    return (0);
-  }
+	if (WAVFile == NULL){
+		printf("No se puede crear el archivo (%s)\n", FileName);
+		return (0);
+	}
 
-  fwrite( header,44,1, WAVFile );
-  fwrite( pista->Sample, header->subChunckSize, 1, WAVFile );
-  return 1;
+	fwrite(header, 44, 1, WAVFile);
+	fwrite(pista->Sample, header->subChunckSize, 1, WAVFile);
+	return 1;
 }
 
 /*
 * Funci�n que corrige el header: cambio de monof�nico a estereof�nico
 * NO MODIFICAR
 */
-void corregirHeader ( struct HeaderType * header ){
+void corregirHeader(struct HeaderType * header){
 	header->Canales = 2;
 	header->TasaBit = header->Frecuencia * header->BitRes / 8 * header->Canales;
 	header->AlineamientoBloque = header->BitRes / 8 * header->Canales;
-	header->subChunckSize = 2*header->subChunckSize;
+	header->subChunckSize = 2 * header->subChunckSize;
 }
