@@ -251,8 +251,51 @@ unsigned short leerMuestreo(unsigned short * pista, int bitpos, int bitsPorMuest
 *  bitsPorMuestreo: tamanio en bits de los muestreos
 */
 //TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
-void unirArchivosWAVE( unsigned short *parte1, unsigned short *parte2, unsigned short *salida, int bitsPorMuestreo )
+void unirArchivosWAVE(unsigned short *parte1, unsigned short *parte2, unsigned short *salida, int bitsPorMuestreo)
 {
+	//TODO definir tamaño
+	int tam = 100;
+	//Calcula cuantos ceros quedan al final
+	int ceros = (tam * 16) % bitsPorMuestreo;
+	//Poscion incial
+	int posSalida = 0;
+	//Numero de muestreos
+	int numMuestreos = (tam * 16) / bitsPorMuestreo;
+
+	//para cada muestreo
+	for (int i = 0; i < numMuestreos; i++)
+	{
+		//posciion de la parte 1 de la cual se va a partir
+		int posParte1 = i*bitsPorMuestreo;
+
+		//muesteo a poner en la salida
+		unsigned short aPoner = leerMuestreo(parte1, posParte1, bitsPorMuestreo);
+		//escribir el meusteo
+		escribirMuestreo(salida, posSalida, aPoner, bitsPorMuestreo);
+		//cambiar la psicion de la salida
+		posSalida += bitsPorMuestreo;
+		//cammbiar la poscion en el la parte 2
+		int posParte2 = i*bitsPorMuestreo;
+		// muestreo que se va a escribir
+		aPoner = leerMuestreo(parte2, posParte2, bitsPorMuestreo);
+	//Escribir el muesteo
+		escribirMuestreo(salida, posSalida, aPoner, bitsPorMuestreo);
+
+		//Cambiar la posición en la salida
+		posSalida += bitsPorMuestreo;
+
+
+	}
+
+	//Si hay que poner ceros
+	if (ceros != 0)
+	{
+		//Esocoge el ultimo shar y le pone los ceros
+    //Por alguna razón funciona acá pero no al final
+		unsigned short *apuntdorAlFinal = &salida[tam - 1];
+		cambiarBitEnposicion(apuntdorAlFinal, posSalida%16, ceros, 0);
+
+	}
 
 
 }
