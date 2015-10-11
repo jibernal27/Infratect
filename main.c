@@ -154,17 +154,43 @@ void cambiarBitEnposicion(unsigned short *indice, int posicion,int cantidad, uns
 *  muestreo: valor del muestreo que se desea guardar en bitPos
 */
 //TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
-void escribirMuestreo ( unsigned short * pista, int bitpos, unsigned short muestreo, int bitsPorMuestreo )
+void escribirMuestreo(unsigned short * pista, int bitpos, unsigned short muestreo, int bitsPorMuestreo)
 {
-  int incio=bitsPorMuestreo;
-  while (bitsPorMuestreo)
-  {
-    pista[bitpos+incio-bitsPorMuestreo]=muestreo;
+	//Posición del short en el que se encuntra el bitpos. Se hace la division entera con 16 puesto que un unsigned short tiene 16 bits.
+	//la posición  empieza en cero.
+	int posEnArrrglo = bitpos / 16;
+	//Posición del bit dentro del unsigned short.
+	int numBitsDesdeInicio = bitpos % 16;
 
-    bitsPorMuestreo--;
-  }
+	//Número de bits restantes hasta que se acabe el unisigned short actual. Incluye el bit actual.
+	int bitsRestantes = 16 - numBitsDesdeInicio;
 
+	//Número de bits para completar los requeidos
+	int bitsSiguiente = bitsPorMuestreo - bitsRestantes;
 
+	//Apuntador al unsigned short actual
+	unsigned short *apuntdorAactual = &pista[posEnArrrglo];
+
+	//Apuntador al unsigned short siguiente
+	unsigned short *apuntdorAsiguiente = &pista[posEnArrrglo + 1];
+
+	if (bitsPorMuestreo>bitsRestantes)
+	{
+		//Toma la siguiente posicon
+
+		//Cmabia el incio indice por los bits finales de actual
+
+		cambiarBitEnposicion(apuntdorAactual, numBitsDesdeInicio, bitsRestantes, darBitEnPosicion(muestreo, 0, bitsRestantes));
+		//Cambia los bits restantes para completar el meustreo de incio por los inciales de sigueinte
+		cambiarBitEnposicion(apuntdorAsiguiente, 0, bitsSiguiente, darBitEnPosicion(muestreo, bitsRestantes, bitsSiguiente));
+
+	}
+	else
+	{
+		//Solocambia los bits inciales de inidice por los de actual a aprtir de la posición especificada.
+
+		cambiarBitEnposicion(apuntdorAactual, numBitsDesdeInicio, bitsPorMuestreo, darBitEnPosicion(muestreo, 0, bitsPorMuestreo));
+	}
 }
 
 /*
@@ -176,7 +202,7 @@ void escribirMuestreo ( unsigned short * pista, int bitpos, unsigned short muest
 //TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
 unsigned short leerMuestreo(unsigned short * pista, int bitpos, int bitsPorMuestreo)
 {
-	//El miestreo se alazena asi xxxxx00000, donde el numero de x es el tamaño del meustreo y las otras xxx son el valor del meustreo
+	//El miestreo se almacena asi xxxxx00000, donde el numero de x es el tamaño del meustreo y las otras xxx son el valor del meustreo
 	unsigned short indice = 0;
 	unsigned short *aRetornar = &indice;
 
@@ -214,9 +240,6 @@ unsigned short leerMuestreo(unsigned short * pista, int bitpos, int bitsPorMuest
 
 
 	return indice;
-
-
-
 }
 
 
