@@ -87,74 +87,6 @@ int main (int argc, char* argv[])
 }
 
 /*
-*  Funcion que escribe bitsPorMuestreo bits en la pista a partir de la posicion indicada por bitPos
-*  pista: apunta a un vector de short que contiene los muestreos de una pista
-*  bitpos: posicion a partir de la cual se desea escribir el muestreo
-*  muestreo: valor del muestreo que se desea guardar en bitPos
-*/
-//TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
-void escribirMuestreo ( unsigned short * pista, int bitpos, unsigned short muestreo, int bitsPorMuestreo )
-{
-  int incio=bitsPorMuestreo;
-  while (bitsPorMuestreo)
-  {
-    pista[bitpos+incio-bitsPorMuestreo]=muestreo;
-
-    bitsPorMuestreo--;
-  }
-
-
-}
-
-/*
-*  Funcion que lee bitsPorMuestreo bits de la pista a partir de la posicion indicada por bitPos
-*  pista: apunta a un vector de short que contiene los muestreos de una pista
-*  bitpos: posicion a partir de la cual se desea leer el muestreo
-*  Retorna el valor del muestreo que se encuentra en la posici�n bitPos
-*/
-//TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
-unsigned short leerMuestreo( unsigned short * pista, int bitpos, int bitsPorMuestreo )
-{
-  unsigned short aRetornar=0;
-    //Posición del short en el que se encuntra el bitpos. Se hace la division entera con 16 puesto que un unsigned short tiene 16 bits.
-    int posEnArrrglo=bitpos/16;
-    //Posición del bit dentro del unsigned short.
-    int numBitsDesdeInicio=bitpos%16;
-
-    //Número de bits restantes hasta que se acabe el unisigned short actual. Incluye el bit actual.
-    int bitsRestantes=16-numBitsDesdeInicio;
-
-    for (int i = 0; i < bitsPorMuestreo; i++)
-    {
-
-    }
-    unsigned short actual=pista[posEnArrrglo];
-    unsigned short sigueinte=1;
-    // Se comprueba si se debe acceder al sigueinte short o no.Además se debe comprobar si es el ultimo short de la cadea porque si lo es
-    //habria un error al intentar acceder a posEnArrrglo+1.
-    if (bitsPorMuestreo>bitsRestantes)
-    {
-      sigueinte=pista[posEnArrrglo+1];
-
-      for (int i = numBitsDesdeInicio; i < bitsPorMuestreo-numBitsDesdeInicio+1; i++)
-      {
-
-
-      }
-
-    }
-     else
-    {
-
-    }
-
-
-
-
-
-}
-
-/*
 *Funcion que retorna la representación en int del bit en la posicion deseada
 *indice: shor del cual se quiere saber el valor del bit en al posición
 *posicion: Posición del bit que se desea encontrar.
@@ -213,6 +145,80 @@ void cambiarBitEnposicion(unsigned short *indice, int posicion,int cantidad, uns
 	}
 
 }
+
+
+/*
+*  Funcion que escribe bitsPorMuestreo bits en la pista a partir de la posicion indicada por bitPos
+*  pista: apunta a un vector de short que contiene los muestreos de una pista
+*  bitpos: posicion a partir de la cual se desea escribir el muestreo
+*  muestreo: valor del muestreo que se desea guardar en bitPos
+*/
+//TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
+void escribirMuestreo ( unsigned short * pista, int bitpos, unsigned short muestreo, int bitsPorMuestreo )
+{
+  int incio=bitsPorMuestreo;
+  while (bitsPorMuestreo)
+  {
+    pista[bitpos+incio-bitsPorMuestreo]=muestreo;
+
+    bitsPorMuestreo--;
+  }
+
+
+}
+
+/*
+*  Funcion que lee bitsPorMuestreo bits de la pista a partir de la posicion indicada por bitPos
+*  pista: apunta a un vector de short que contiene los muestreos de una pista
+*  bitpos: posicion a partir de la cual se desea leer el muestreo
+*  Retorna el valor del muestreo que se encuentra en la posici�n bitPos
+*/
+//TODO: DESARROLLAR COMPLETAMENTE ESTA FUNCION
+unsigned short leerMuestreo(unsigned short * pista, int bitpos, int bitsPorMuestreo)
+{
+	//El miestreo se alazena asi xxxxx00000, donde el numero de x es el tamaño del meustreo y las otras xxx son el valor del meustreo
+	unsigned short indice = 0;
+	unsigned short *aRetornar = &indice;
+
+	//Posición del short en el que se encuntra el bitpos. Se hace la division entera con 16 puesto que un unsigned short tiene 16 bits.
+	//la posición  empieza en cero.
+	int posEnArrrglo = bitpos / 16;
+	//Posición del bit dentro del unsigned short.
+	int numBitsDesdeInicio = bitpos % 16;
+
+	//Número de bits restantes hasta que se acabe el unisigned short actual. Incluye el bit actual.
+	int bitsRestantes = 16 - numBitsDesdeInicio;
+
+	//Numero de bits para completar los requeidos
+	int bitsSiguiente = bitsPorMuestreo - bitsRestantes;
+
+	unsigned short actual = pista[posEnArrrglo];
+	unsigned short sigueinte = 0;
+	// Se comprueba si se debe acceder al sigueinte short o no.Además se debe comprobar si es el ultimo short de la cadea porque si lo es
+	//habria un error al intentar acceder a posEnArrrglo+1.
+	if (bitsPorMuestreo>bitsRestantes)
+	{
+		//Toma la siguiente posicon
+			sigueinte = pista[posEnArrrglo + 1];
+	//Cmabia el incio indice por los bits finales de actual
+		cambiarBitEnposicion(aRetornar, 0, bitsRestantes, darBitEnPosicion(actual, numBitsDesdeInicio, bitsRestantes));
+		//Cambia los bits restantes para completar el meustreo de incio por los inciales de sigueinte
+		cambiarBitEnposicion(aRetornar, bitsRestantes, bitsPorMuestreo - bitsRestantes, darBitEnPosicion(sigueinte, 0, bitsSiguiente));
+
+	}
+	else
+	{
+		//Solocambia los bits inciales de inidice por los de actual a aprtir de la posición especificada.
+		cambiarBitEnposicion(aRetornar, 0, bitsPorMuestreo, darBitEnPosicion(actual, numBitsDesdeInicio, bitsPorMuestreo));
+	}
+
+
+	return indice;
+
+
+
+}
+
 
 /*
 *  Funcion para fundir dos pistas monofonicas en una sola estereo
